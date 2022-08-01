@@ -1,0 +1,154 @@
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+:root {
+    --light: #edf2f9;
+    --dark: #152e4d;
+    --darker: #12263f;
+    /*  */
+    --color-primary: var(--color-cyan);
+    --color-primary-50: var(--color-cyan-50);
+    --color-primary-100: var(--color-cyan-100);
+    --color-primary-light: var(--color-cyan-light);
+    --color-primary-lighter: var(--color-cyan-lighter);
+    --color-primary-dark: var(--color-cyan-dark);
+    --color-primary-darker: var(--color-cyan-darker);
+    /*  */
+    --color-green: #16a34a;
+    --color-green-50: #f0fdf4;
+    --color-green-100: #dcfce7;
+    --color-green-light: #22c55e;
+    --color-green-lighter: #4ade80;
+    --color-green-dark: #15803d;
+    --color-green-darker: #166534;
+    /*  */
+    --color-blue: #00aeef;
+    --color-blue-50: #effaff;
+    --color-blue-100: #def3ff;
+    --color-blue-light: #2ccaff;
+    --color-blue-lighter: #75dbff;
+    --color-blue-dark: #0090d4;
+    --color-blue-darker: #0073ab;
+    /*  */
+    --color-cyan: #0891b2;
+    --color-cyan-50: #ecfeff;
+    --color-cyan-100: #cffafe;
+    --color-cyan-light: #06b6d4;
+    --color-cyan-lighter: #22d3ee;
+    --color-cyan-dark: #0e7490;
+    --color-cyan-darker: #155e75;
+    /*  */
+    --color-teal: #0d9488;
+    --color-teal-50: #f0fdfa;
+    --color-teal-100: #ccfbf1;
+    --color-teal-light: #14b8a6;
+    --color-teal-lighter: #2dd4bf;
+    --color-teal-dark: #0f766e;
+    --color-teal-darker: #115e59;
+    /*  */
+    --color-fuchsia: #c026d3;
+    --color-fuchsia-50: #fdf4ff;
+    --color-fuchsia-100: #fae8ff;
+    --color-fuchsia-light: #d946ef;
+    --color-fuchsia-lighter: #e879f9;
+    --color-fuchsia-dark: #a21caf;
+    --color-fuchsia-darker: #86198f;
+    /*  */
+    --color-violet: #7c3aed;
+    --color-violet-50: #f5f3ff;
+    --color-violet-100: #ede9fe;
+    --color-violet-light: #8b5cf6;
+    --color-violet-lighter: #a78bfa;
+    --color-violet-dark: #6d28d9;
+    --color-violet-darker: #5b21b6;
+}
+
+@layer components {
+    .toggle:checked + span {
+        @apply top-0 left-6 bg-primary;
+    }
+    .toggle:disabled + span {
+        @apply bg-gray-500 shadow-none;
+    }
+    .toggle:checked:disabled {
+        @apply bg-gray-200;
+    }
+    .toggle:checked:disabled + span {
+        @apply shadow-none bg-primary-lighter;
+    }
+    .toggle:focus + span {
+        @apply ring ring-primary-lighter;
+    }
+
+    input:invalid.invalid,
+    textarea:invalid.invalid {
+        @apply ring ring-danger-light dark:ring-danger;
+    }
+}
+
+input[type='number']::-webkit-inner-spin-button,
+input[type='number']::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.custom-number-input input:focus {
+    outline: none !important;
+}
+
+.custom-number-input button:focus {
+    outline: none !important;
+}
+
+/* The switch - the box around the slider */
+.switch {
+    position: relative;
+    display: inline-block;
+}
+
+/* Hide default HTML checkbox */
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+/* The slider */
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    -webkit-transition: .4s;
+    transition: .4s;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 1.65rem;
+    width: 1.65rem;
+    background-color: #0890b2;
+    -webkit-transition: .4s;
+    transition: .4s;
+    bottom: -0.1rem;
+    border-radius: 50%;
+}
+
+.slider-dark:before {
+    background-color: white;
+}
+
+input:checked + .slider {
+    background-color: #22d3ee;
+}
+
+input:checked + .slider:before {
+    -webkit-transform: translateX(1.4rem);
+    -ms-transform: translateX(1.4rem);
+    transform: translateX(1.4rem);
+}

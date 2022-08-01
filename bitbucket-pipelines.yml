@@ -1,0 +1,101 @@
+image: php:8.1.7-fpm
+pipelines:
+  custom:
+    mergeback: # Merge back tester
+      - step:
+          name: "Merge back to develop"
+          script:
+            - apt-get update && apt-get install -y unzip git
+            - git clone git@bitbucket.org:tombvdev/tomshop.git
+            - cd backoffice
+            - git config --global user.email "development@tom-bv.com"
+            - git config --global user.name "development bot"
+            - git checkout main
+            - git pull
+            - git checkout develop
+            - git pull
+            - git merge main --no-ff --no-edit
+            - git push
+  branches:
+    main:
+      - step:
+          name: Staging deploy
+          deployment: staging
+          image: mcuyar/docker-envoy
+          caches:
+            - composer
+          script:
+            - envoy run deploy --server="staging" --commit="$BITBUCKET_COMMIT" --repo="$BITBUCKET_GIT_SSH_ORIGIN" --buildNr="$BITBUCKET_BUILD_NUMBER"
+      - step:
+          name: Production deploy
+          trigger: manual
+          deployment: production
+          image: mcuyar/docker-envoy
+          caches:
+            - composer
+          script:
+            - envoy run deploy --server="production" --commit="$BITBUCKET_COMMIT" --repo="$BITBUCKET_GIT_SSH_ORIGIN" --buildNr="$BITBUCKET_BUILD_NUMBER"
+      - step:
+          name: "Merge back to develop"
+          script:
+            - apt-get update && apt-get install -y unzip git
+            - git clone git@bitbucket.org:tombvdev/tomshop.git
+            - cd tomshop
+            - git config --global user.email "development@tom-bv.com"
+            - git config --global user.name "development bot"
+            - git checkout main
+            - git pull
+            - git checkout develop
+            - git pull
+            - git merge main --no-ff --no-edit
+            - git push
+    develop:
+      - step:
+          name: Testing deploy
+          deployment: test
+          image: mcuyar/docker-envoy
+          caches:
+            - composer
+          script:
+            - envoy run deploy --server="testing" --commit="$BITBUCKET_COMMIT" --repo="$BITBUCKET_GIT_SSH_ORIGIN" --buildNr="$BITBUCKET_BUILD_NUMBER"
+    '{feature/*,hotfix/*}':
+      - step:
+          name: Test application
+          caches:
+            - composer
+          script:
+            - apt-get update && apt-get install -qy unzip git curl libmcrypt-dev mariadb-client
+            - yes | pecl install mcrypt-1.0.5
+            - docker-php-ext-install pdo_mysql
+            #            - docker-php-ext-install ext-exif
+            - apt-get -yqq update
+            - apt-get -yqq install exiftool
+            - docker-php-ext-configure exif
+            - docker-php-ext-install exif
+            - docker-php-ext-enable exif
+            - curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+#            - mkdir storage && cd storage && mkdir framework && cd framework
+            - mkdir -p storage/framework
+            - mkdir -p sessions && mkdir -p views && mkdir -p cache
+            - pwd
+            - composer install --optimize-autoloader
+            - ln -f -s .env.pipelines .env
+            - php artisan migrate:fresh --seed
+            - php artisan serve &
+            - sleep 5
+            - ./vendor/bin/phpcs --error-severity=1  --warning-severity=6 ./app
+            - php artisan test
+          artifacts:
+            - vendor/**
+            - .env
+          services:
+            - mariadb
+definitions:
+  services:
+    mariadb:
+      image: mariadb:10.1.41
+      environment:
+        MYSQL_DATABASE: 'homestead'
+        MYSQL_RANDOM_ROOT_PASSWORD: 'yes'
+        MYSQL_USER: 'homestead'
+        MYSQL_PASSWORD: 'secret'
